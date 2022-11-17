@@ -137,6 +137,8 @@ plt.figure(1)
 plt.plot(recall_scikit,precision_scikit,'-k')
 plt.xlabel("Recall")
 plt.ylabel("Precision")
+ax = plt.gca()
+ax.set_ylim([0.5,1.01])
 
 #k-nearest-neighbors implementation with Kfold to decide k
 avg_error = []

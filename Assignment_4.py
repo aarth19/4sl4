@@ -21,6 +21,7 @@ X = dataset.iloc[:, :-1].values
 t = dataset.iloc[:, -1].values
 X_train, X_test, target_train, target_test = train_test_split(X, t, test_size=0.33, random_state=1361)
 
+#obtaining cross validation error for decision trees with 2 to 400 max leaves
 plt.figure(1)
 avg_error = []
 for i in range(2,401):
@@ -34,6 +35,7 @@ for i in range(2,401):
     avg_error.append(np.sum(cross_error)/len(cross_error)) #error for each number of leaves
 plt.plot(range(2,401),avg_error)
 
+#test error for decision tree with leaves with least cross validation error
 plt.figure(2)
 estimators = range(50,2501,50)
 best_leaves = np.argmin(avg_error) + 2
@@ -41,38 +43,35 @@ pred = (DecisionTreeClassifier(max_leaf_nodes=best_leaves).fit(X_train,target_tr
 error = misclass_rate(pred,target_test)
 plt.plot(estimators,np.ones(len(estimators))*error,'-m',label='Best Decision Tree Classifier')
 
+#test error for 50 bagging classifiers
 avg_error = []
 for i in estimators:
     pred = (BaggingClassifier(n_estimators=i, random_state=1361).fit(X_train, target_train)).predict(X_test)
     avg_error.append(misclass_rate(pred,target_test))
 plt.plot(estimators,avg_error,'-r',label='Bagging Classifier')
 
+#test error for 50 random forest classifiers
 avg_error = []
 for i in estimators:
     pred = (RandomForestClassifier(n_estimators=i, random_state=1361).fit(X_train, target_train)).predict(X_test)
     avg_error.append(misclass_rate(pred,target_test))
 plt.plot(estimators,avg_error,'-g',label='Random Forest Classifier')
 
+#test error for 50 adaboost classifiers with decision stumps as base
 avg_error = []
 for i in estimators:
     pred = (AdaBoostClassifier(DecisionTreeClassifier(max_depth=1),n_estimators=i, random_state=1361).fit(X_train, target_train)).predict(X_test)
     avg_error.append(misclass_rate(pred,target_test))
 plt.plot(estimators,avg_error,'-b',label='Adaboost with Decision Stump')
 
+#test error for 50 adaboost classifiers with 10 leaf trees as base
 avg_error = []
 for i in estimators:
     pred = (AdaBoostClassifier(DecisionTreeClassifier(max_leaf_nodes=10),n_estimators=i, random_state=1361).fit(X_train, target_train)).predict(X_test)
     avg_error.append(misclass_rate(pred,target_test))
 plt.plot(estimators,avg_error,'-k',label='Adaboost with Decision Tree with 10 Leaves')
 
-avg_error = []
-for i in estimators:
-    pred = (AdaBoostClassifier(DecisionTreeClassifier(),n_estimators=i, random_state=1361).fit(X_train, target_train)).predict(X_test)
-    avg_error.append(misclass_rate(pred,target_test))
-plt.plot(estimators,avg_error,'-c',label='Adaboost with Unlimited Decision Tree')
-plt.legend()
-plt.show()
-
+#test error for 50 adaboost classifiers with unlimited trees as base
 avg_error = []
 for i in estimators:
     pred = (AdaBoostClassifier(DecisionTreeClassifier(),n_estimators=i, random_state=1361).fit(X_train, target_train)).predict(X_test)
